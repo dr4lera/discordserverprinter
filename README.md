@@ -1,4 +1,5 @@
-![image](https://github.com/user-attachments/assets/2533eb7a-9dac-49eb-905a-1c82180b0377)
+![image](https://github.com/user-attachments/assets/289b8671-23ad-4b4d-9fb1-a35005a4e7ff)
+
 sets up pretty servers and a few roles so you don't have to!
 RECOMENDED PY VERSION 3.10-3.11 3.12+ is unstable for discord
 
