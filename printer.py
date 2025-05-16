@@ -69,7 +69,8 @@ Requirements:
    - ℹ️info
 4. All channels must have emoji prefixes relevant to the theme (like 🎮 for gaming).
 5. Channels can be "text" or "voice".
-6. Return no explanations, only well-formed JSON.
+6. Ensure descriptions are lively and hook the user
+7. Return no explanations, only well-formed JSON.
 
 Example categories structure:
 
