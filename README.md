@@ -1,3 +1,8 @@
+![image](https://github.com/user-attachments/assets/2533eb7a-9dac-49eb-905a-1c82180b0377)
+sets up pretty servers and a few roles so you don't have to!
+
+
+
 Uses dotenv set up a file named '.env' after installing the pre reqs
 
 pip install -r requirements.txt
