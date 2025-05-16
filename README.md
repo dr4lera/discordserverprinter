@@ -9,9 +9,11 @@ Uses dotenv set up a file named '.env' after installing the pre reqs
 pip install -r requirements.txt
 //
 pip install discord.py openai pillow aiohttp python-dotenv
+
+
+
+
 and then
-
-
 put this in .env 
 
 
