@@ -13,7 +13,7 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
 tree = bot.tree
 
-# OpenAI client setup (new method)
+# OpenAI client setup
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @bot.event
@@ -49,24 +49,27 @@ async def setup(interaction: discord.Interaction, theme: str):
                 except Exception as e:
                     print(f"Failed to delete role {role.name}: {e}")
 
-        # Prompt for OpenAI GPT-4
+        # Prompt for OpenAI
         prompt = f"""
 You are helping set up a Discord server based on the theme: "{theme}".
 Return ONLY valid JSON with the following structure:
+- server_name (string)
+- server_description (string)
 - description (string)
 - roles (list of objects with 'name', 'color' (hex string), and 'permissions' (list of permission strings))
 - categories (list of objects with 'name' and 'channels' list)
 - welcome (object with 'channel' and 'message')
 
 Requirements:
-1. Include at least 15 channels total across categories.
-2. Add a mandatory category named "Info" with these text channels:
+1. Include AT LEAST 5 roles.
+2. Include AT LEAST 20 channels total across categories.
+3. Add a mandatory category named "Info" with these text channels:
    - 📜rules
    - 📢announcements
-   -ℹ️info
-3. All channels should have emoji prefixes relevant to the theme (like 🎮 for gaming).
-4. Channels can be "text" or "voice".
-5. Return no explanations, only well-formed JSON.
+   - ℹ️info
+4. All channels must have emoji prefixes relevant to the theme (like 🎮 for gaming).
+5. Channels can be "text" or "voice".
+6. Return no explanations, only well-formed JSON.
 
 Example categories structure:
 
@@ -76,14 +79,14 @@ Example categories structure:
     "channels": [
       {{"name": "📜rules", "type": "text"}},
       {{"name": "📢announcements", "type": "text"}},
-      {{"name": ℹ️info", "type": "text"}}
+      {{"name": "ℹ️info", "type": "text"}}
     ]
   }},
   ...
 ]
 """
 
-        # Call OpenAI
+        
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
@@ -93,7 +96,23 @@ Example categories structure:
         raw_content = response.choices[0].message.content.strip("```json").strip("```").strip()
         server_structure = json.loads(raw_content)
 
-        # Create roles
+        
+        new_name = server_structure.get("server_name")
+        new_description = server_structure.get("server_description")
+
+        if new_name:
+            try:
+                await guild.edit(name=new_name)
+            except Exception as e:
+                print(f"❌ Failed to change server name: {e}")
+
+        if new_description:
+            try:
+                await guild.edit(description=new_description)
+            except Exception as e:
+                print(f"❌ Failed to change server description: {e}")
+
+       
         role_objects = {}
         for role in server_structure.get("roles", []):
             perms = discord.Permissions()
@@ -111,7 +130,7 @@ Example categories structure:
             )
             role_objects[role["name"]] = new_role
 
-        # Create categories and channels
+       
         for category in server_structure.get("categories", []):
             cat = await guild.create_category(category["name"])
             for ch in category.get("channels", []):
@@ -120,7 +139,7 @@ Example categories structure:
                 elif ch["type"] == "voice":
                     await guild.create_voice_channel(ch["name"], category=cat)
 
-        # Send welcome message
+        
         welcome_channel_name = server_structure.get("welcome", {}).get("channel")
         welcome_msg = server_structure.get("welcome", {}).get("message")
         if welcome_channel_name and welcome_msg:
@@ -128,7 +147,9 @@ Example categories structure:
             if welcome_channel:
                 await welcome_channel.send(welcome_msg)
 
-        await interaction.followup.send("✅ Server setup complete!")
+        await interaction.followup.send(
+            f"✅ Server setup complete!\n**Server Name:** {new_name or guild.name}\n**Description:** {new_description or 'No description provided.'}"
+        )
 
     except Exception as e:
         print(f"Exception in setup: {e}")
