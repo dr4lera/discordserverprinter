@@ -4,6 +4,9 @@ sets up pretty servers and a few roles so you don't have to!
 RECOMENDED PY VERSION 3.10-3.11 3.12+ is unstable for discord
 
 
+
+to use icon printer setup a second bot token inside of iconprinter.py or u can setup a second bot token slot in your env I personally was lazy and just jammed a second bot token in 
+
 Uses dotenv set up a file named '.env' after installing the pre reqs
 
 pip install -r requirements.txt
